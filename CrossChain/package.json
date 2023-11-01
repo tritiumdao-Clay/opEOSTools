@@ -5,8 +5,10 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomiclabs/hardhat-web3-legacy": "^2.0.0",
     "dotenv": "^16.3.1",
     "hardhat": "^2.18.3",
-    "hardhat-contract-sizer": "^2.10.0"
+    "hardhat-contract-sizer": "^2.10.0",
+    "web3": "^0.20.7"
   }
 }
