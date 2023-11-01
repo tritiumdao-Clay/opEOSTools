@@ -28,18 +28,18 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      forking: {
+        url: `http://127.0.0.1:8545`,
+        blockNumber: 19316651,
+      },
       //forking: {
-      //  url: `https://sepolia.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
-      //  blockNumber: 3085764
+      //  url: `http://127.0.0.1:8545`,
+      //  blockNumber: 100,
       //},
-      accounts: {
-        mnemonic: `${process.env.MNEMONIC}`,
-        count: 10,
-      }
-      //accounts: [{
-      //  "privateKey": process.env.MAINNET_DEPLOYER_PRIVATE_KEY,
-      //  "balance": "10000000000000000000000000",
-      //}],
+      accounts: [{
+        "privateKey": process.env.DEPLOYER_PRIVATE_KEY,
+        "balance": "10000000000000000000000000",
+      }],
     },
     eosevmtest: {
       url: `https://api.testnet.evm.eosnetwork.com`,
