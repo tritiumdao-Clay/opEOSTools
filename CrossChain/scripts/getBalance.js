@@ -21,15 +21,15 @@ async function main() {
     let l1Contract = new hre.ethers.Contract(process.env.L1_TOKEN_ADDRESS, l1Factory.interface, l1Wallet)
     let l2Contract = new hre.ethers.Contract(process.env.L2_TOKEN_ADDRESS, l1Factory.interface, l2Wallet)
 
-    let beforeL1ETHBalance = await l1Wallet.getBalance()
+    let beforeL1ETHBalance = await l1RpcProvider.getBalance(l1Wallet.address)
     console.log("L1ETHBalance:", beforeL1ETHBalance)
     let beforeL1ERC20Balance = await l1Contract.balanceOf(owner.address)
     console.log("L1ERC20Balance:", beforeL1ERC20Balance)
 
+    let beforeL2ETHBalance = await l2RpcProvider.getBalance(l2Wallet.address)
+    console.log("L2ETHBalance", beforeL2ETHBalance)
     let beforeL2ERC20Balance = await l2Contract.balanceOf(owner.address)
     console.log("L2ERC20Balance:", beforeL2ERC20Balance)
-    let beforeL2ETHBalance = await l2Wallet.balanceOf(owner.address)
-    console.log("L2ETHBalance", beforeL2ETHBalance)
 }
 
 main().catch((error) => {
