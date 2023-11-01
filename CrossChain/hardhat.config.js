@@ -46,15 +46,18 @@ module.exports = {
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],
       gasPrice: 150000000000,
       gas: 1000000,
-      allowUnlimitedContractSize: true,
     },
     eosevm: {
       url: `https://api.evm.eosnetwork.com`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],
+      gasPrice: 150000000000,
+      gas: 1000000,
     },
     local: {
       url: `http://127.0.0.1:8545`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],
+      gasPrice: 150000000000,
+      gas: 1000000,
     },
   },
   contractSizer: {

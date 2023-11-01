@@ -4,7 +4,6 @@ const fs = require("fs");
 async function main() {
     const [owner, userAddr] = await hre.ethers.getSigners();
     console.log("owner addr:", await owner.getAddress())
-
     owner.provider.estimateGas = async(transaction) => {
         return hre.config.networks.hardhat.gas;
     }
@@ -32,6 +31,7 @@ async function main() {
     let l1Addr = process.env.L1_TOKEN_ADDRESS
     let event = deployRcpt.events.filter(x => x.event == "OptimismMintableERC20Created")[0]
     let l2Addr = event.args.localToken
+    console.log("l1 token:", l1Addr)
     console.log("l2 token:", l2Addr)
 
 
