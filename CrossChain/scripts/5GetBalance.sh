@@ -1,5 +1,5 @@
 #Fifth,
-#source getBalance.sh
+#source ./scripts/getBalance.sh
 source .env
 echo -n $DEPLOYER_ADDR" eth balance(L1):"
 cast rpc eth_getBalance $DEPLOYER_ADDR "latest"  --rpc-url $L1_RPC

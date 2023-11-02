@@ -1,7 +1,7 @@
 #Fourth,
 # source depositAndWithdraw.sh
 source .env
-cast call --rpc-url $L1_RPC --private-key $DEPLOYER_PRIVATE_KEY $L1StandardBridgeProxy "depositERC20(address,address,uint256,uint32,bytes)" $L1_TOKEN_ADDRESS $L2_TOKEN_ADDRESS 100 1000000 0x0 
+cast send --rpc-url $L1_RPC --legacy --cast-async --gas-price 150000000000 --private-key $DEPLOYER_PRIVATE_KEY $L1StandardBridgeProxy "depositERC20(address,address,uint256,uint32,bytes)" $L1_TOKEN_ADDRESS $L2_TOKEN_ADDRESS 100 1000000 ""
 
 #const hre = require("hardhat");
 #const fs = require("fs");

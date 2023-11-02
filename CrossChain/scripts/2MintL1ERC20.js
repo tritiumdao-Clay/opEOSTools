@@ -1,5 +1,4 @@
-//Second, L1 env
-//npx hardhat --network eosevmtest run ./scripts/mintL1ERC20.js
+// npx hardhat --network eosevmtest run ./scripts/2MintL1ERC20.js
 const hre = require("hardhat");
 
 async function main() {
@@ -7,13 +6,13 @@ async function main() {
     owner.provider.estimateGas = async(transaction) => {
     return hre.config.networks.hardhat.gas;
     }
-    console.log("owner adress:", owner.address)
+    console.log("owner address:", owner.address)
 
     let l1Addr = process.env.L1_TOKEN_ADDRESS
     const testERC20 = await hre.ethers.getContractAt("TestERC20", l1Addr, owner)
     await testERC20.mint(owner.address, 10000)
     let balance = await testERC20.balanceOf(owner.address)
-    console.log("debug0:", balance)
+    console.log("owner balance:", balance)
 }
 
 main().catch((error) => {

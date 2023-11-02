@@ -1,9 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 
 /** @type import('hardhat/config').HardhatUserConfig */
-require("hardhat-contract-sizer");
-require("@openzeppelin/hardhat-upgrades");
-require("hardhat-gas-reporter");
 require("@nomiclabs/hardhat-web3-legacy");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -59,17 +56,6 @@ module.exports = {
       gasPrice: 150000000000,
       gas: 1000000,
     },
-  },
-  contractSizer: {
-    alphaSort: true,
-    disambiguatePaths: false,
-    runOnCompile: false,
-    strict: true,
-  },
-  gasReporter: {
-    enabled: false,
-    currency: "CHF",
-    gasPrice: 21,
   },
   mocha: {
     timeout: 100000,
