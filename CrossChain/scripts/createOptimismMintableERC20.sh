@@ -1,7 +1,7 @@
 #Third, L2 env
 #source ./scripts/createOptimismMintableERC20.sh
 source .env
-cast call --rpc-url $L2_RPC --private-key $DEPLOYER_PRIVATE_KEY 0x4200000000000000000000000000000000000012 "createOptimismMintableERC20(address,string,string)" $L1_L1_TOKEN_ADDRESS "Token Name on L2" "L2-SYMBOL" --cast-async
+cast call --rpc-url $L2_RPC --private-key $DEPLOYER_PRIVATE_KEY 0x4200000000000000000000000000000000000012 "createOptimismMintableERC20(address,string,string)" $L1_TOKEN_ADDRESS "Token Name on L2" "L2-SYMBOL" 
 
 #const hre = require("hardhat");
 #const fs = require("fs");

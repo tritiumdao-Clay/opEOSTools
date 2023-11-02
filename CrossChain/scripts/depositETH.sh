@@ -1,8 +1,7 @@
 #Fourth,
 # source depositAndWithdraw.sh
 source .env
-cast call --rpc-url $L1_RPC --private-key $DEPLOYER_PRIVATE_KEY $L1StandardBridgeProxy "depositETH(uint32,bytes)" 100 0x0 --cast-async --value 100
-cast call --rpc-url $L1_RPC --private-key $DEPLOYER_PRIVATE_KEY $L1StandardBridgeProxy "depositERC20(address,address,uint256,uint32,bytes)" $L1_TOKEN_ADDRESS $L2_TOKEN_ADDRESS 100 1000000 0x0 --cast-async
+cast call --rpc-url $L1_RPC --private-key $DEPLOYER_PRIVATE_KEY $L1StandardBridgeProxy "depositETH(uint32,bytes)" 100 0x0 --value 100
 
 #const hre = require("hardhat");
 #const fs = require("fs");
