@@ -1,4 +1,5 @@
 //Second, L1 env
+//npx hardhat --network eosevmtest run ./scripts/mintL1ERC20.js
 const hre = require("hardhat");
 
 async function main() {

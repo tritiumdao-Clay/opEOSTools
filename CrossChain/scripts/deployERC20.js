@@ -1,4 +1,5 @@
 //First, L1 env
+//npx hardhat --network eosevmtest run ./scripts/deployERC20.js
 const hre = require("hardhat");
 
 async function main() {
