@@ -42,16 +42,17 @@ func tomHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			//bodyText = bodyText[:len(bodyText)-1]
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Println("----------")
+			fmt.Println("------begin----")
 			fmt.Printf("%s", bodyText[:len(bodyText)-1])
 			//fmt.Printf(string(bodyText))
-			fmt.Println("----------")
+			fmt.Println("-----end--------")
 			type JsonResult struct {
 				Id      uint64 `json:"id"`
 				Jsonrpc string `json:"jsonrpc"`
 				Result  string `json:"result"`
 			}
 			var jsonResult JsonResult
+			fmt.Println("ssssssssssss")
 			err = json.Unmarshal(bodyText, &jsonResult)
 			if err != nil {
 				fmt.Println("debug2", err.Error())
