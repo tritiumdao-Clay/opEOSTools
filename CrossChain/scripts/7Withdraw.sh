@@ -1,2 +1,10 @@
 source .env
-cast
+cast send --rpc-url $L2_RPC --legacy --cast-async --gas-price 150000000000 --value 1 --private-key $DEPLOYER_PRIVATE_KEY $L2StandardBridgeProxy "withdraw(address, uint256, uint32, bytes)" $ETH_DEAD_ADDR 1 1000000 ""
+
+
+# 向 $L2StandardBridgeProxy 调用函数 withdraw
+# proposer向L1链发布proposer(stateRoot, struct OutputProposal{xxx})
+# 监听 L2ToL1MessagePasser 地址 MessagePassed(nonce, sender, target, value, gasLimit, data, withdrawHash)
+# 调用L1的 OptimismPortal 合约 的 proveWithdrawalTransaction(xx), finalizeWithdrawalTransaction(xx)
+
+
