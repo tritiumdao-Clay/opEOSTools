@@ -20,8 +20,10 @@ func tomHandler(w http.ResponseWriter, r *http.Request) {
 		dataA := make([]byte, 4000)
 		r.Body.Read(dataA)
 		dataB := string(dataA)
+		fmt.Println("debug0", len(dataB))
 		dataB = strings.ReplaceAll(dataB, "input", "data")
 		fmt.Println("debug0", string(dataB))
+		fmt.Println("debug0", len(dataB))
 
 		{
 			client := &http.Client{}
