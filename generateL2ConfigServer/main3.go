@@ -19,11 +19,13 @@ func tomHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		dataA := make([]byte, 4000)
 		r.Body.Read(dataA)
-		fmt.Println("debug0", string(dataA))
+		dataB := string(dataA)
+		strings.ReplaceAll(dataB, "input", "data")
+		fmt.Println("debug0", string(dataB))
 
 		{
 			client := &http.Client{}
-			var data = strings.NewReader(string(dataA))
+			var data = strings.NewReader(string(dataB))
 			req, err := http.NewRequest("POST", "https://api.testnet.evm.eosnetwork.com", data)
 			if err != nil {
 				log.Fatal(err)
