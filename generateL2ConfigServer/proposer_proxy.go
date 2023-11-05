@@ -19,7 +19,7 @@ func tomHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		dataA := make([]byte, 4000)
 		n, _ := r.Body.Read(dataA)
-		dataB := string(dataA[:n-1])
+		dataB := string(dataA[:n])
 		fmt.Println("debug0", len(dataB))
 		dataB = strings.ReplaceAll(dataB, "input", "data")
 		fmt.Println("debug0", dataB)
