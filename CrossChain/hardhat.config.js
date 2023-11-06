@@ -44,6 +44,10 @@ module.exports = {
       gasPrice: 150000000000,
       gas: 1000000,
     },
+    L2: {
+      url: `${process.env.L2_RPC}`,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY],
+    },
     eosevm: {
       url: `https://api.evm.eosnetwork.com`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],

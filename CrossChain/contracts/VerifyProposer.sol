@@ -1,6 +1,6 @@
 pragma solidity ^0.8.9;
 
-contract C {
+contract VerifyProposer {
 
     bytes32 public a;
     bytes32 public b;
