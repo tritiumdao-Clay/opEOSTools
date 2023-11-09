@@ -142,6 +142,7 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 		return "", err
 	}
 
+	fmt.Println("debug24")
 	type typesWithdrawalTransaction struct {
 		Nonce    *big.Int       `json:"nonce"`
 		Sender   common.Address `json:"sender"`
@@ -192,6 +193,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 	l2 := ethclient.NewClient(l2c)
 	l2g := gethclient.New(l2c)
 
+	fmt.Println("debug30")
 	receipt, err := l2.TransactionReceipt(ctx, l2TxHash)
 	if err != nil {
 		return "", err
@@ -200,6 +202,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 		return "", errors.New("unsuccessful withdrawal receipt status")
 	}
 
+	fmt.Println("debug31")
 	l2WithdrawalBlock, err := l2.BlockByNumber(ctx, receipt.BlockNumber)
 	if err != nil {
 		return "", err
