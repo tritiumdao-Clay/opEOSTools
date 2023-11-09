@@ -110,7 +110,7 @@ func main() {
 		http.HandleFunc("/getUserTxHash", getUserTxHash)
 
 		log.Println("Go!")
-		http.ListenAndServe(":10003", nil)
+		http.ListenAndServe(":3000", nil)
 	} else {
 		if withdrawalFlag == "" {
 			log.Fatalf("missing --withdrawal flag")
@@ -279,6 +279,29 @@ func initWork(withdrawalFlag string) (l1 *ethclient.Client, l2c *rpc.Client, l2o
 	return l1Client, l2Client, l2oo, portal, l2TxHash, finalizationPeriod, nil
 }
 
+type Error struct {
+	Err string `json:"error"`
+}
+type Success struct {
+	Suc string `json:"result"`
+}
+
+func wrapError(error string) string {
+	var a = Error{
+		Err: error,
+	}
+	ret, _ := json.Marshal(a)
+	return string(ret)
+}
+
+func wrapSuccess(success string) string {
+	var a = Success{
+		Suc: success,
+	}
+	ret, _ := json.Marshal(a)
+	return string(ret)
+}
+
 func writeTxHash(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
@@ -296,7 +319,7 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 		var res = Resp{}
 		err := json.Unmarshal([]byte(dataB), &res)
 		if err != nil {
-			io.WriteString(w, "parse json fail. req:"+dataB)
+			io.WriteString(w, wrapError("parse json fail. req:"+dataB))
 			return
 		}
 
@@ -308,21 +331,21 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 		}
 		a, err := json.Marshal(database)
 		if err != nil {
-			io.WriteString(w, "write fail")
+			io.WriteString(w, wrapError("write fail"))
 			return
 		}
-		fmt.Println("debug", string(a))
 		os.WriteFile(path, a, 0644)
-		io.WriteString(w, "success")
+		io.WriteString(w, wrapSuccess("success"))
 		return
 
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Fprintf(w, "I can't do that.")
+		io.WriteString(w, wrapError("I can't do that"))
 	}
 }
 
 func getUserTxHash(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("debug----")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -334,15 +357,11 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
 			io.WriteString(w, `{"error":"parse json fail"}`)
+			return
 		}
 		dataB := req.UserAddr
-		//fmt.Println("debug0:", dataB, len(dataB))
 		var userAddr string
 		userAddr = dataB
-		//err := json.Unmarshal(dataA[:n], &userAddr)
-		//if err != nil {
-		//io.WriteString(w, "invalid req:"+err.Error())
-		//}
 		if len(userAddr) != 42 {
 			io.WriteString(w, "len(str) is must be 42")
 			return
@@ -351,6 +370,7 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 		withdrashHashesBytes, err := json.Marshal(withdrashHashes)
 		if err != nil {
 			io.WriteString(w, "internal fail:"+err.Error())
+			return
 		}
 		w.Write(withdrashHashesBytes)
 		return
@@ -373,6 +393,7 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
 			io.WriteString(w, `{"error":"parse json fail"}`)
+			return
 		}
 		dataB := req.WithdrawHash
 		//fmt.Println("debug0:", dataB, len(dataB))
@@ -384,10 +405,11 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 		}
 		ret, err := withdraw.ProveWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash)
 		if err != nil {
-			io.WriteString(w, err.Error())
+			io.WriteString(w, `{"error":"`+err.Error()+`"}`)
 			return
 		}
 		io.WriteString(w, ret)
+		return
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		fmt.Fprintf(w, "I can't do that.")
@@ -396,6 +418,7 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 
 func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("debug----")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -404,23 +427,29 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 			WithdrawHash string
 		}
 		var req = Req{}
+		fmt.Println("debug0:", string(dataA), len(dataA))
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
-			io.WriteString(w, `{"error":"parse json fail"`)
+			io.WriteString(w, `{"error":"parse json fail"}`)
+			return
 		}
 		dataB := req.WithdrawHash
 
+		fmt.Println("debug0")
 		l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod, err := initWork(dataB)
 		if err != nil {
 			io.WriteString(w, err.Error())
 			return
 		}
+		fmt.Println("debug1")
 		ret, err := withdraw.CompleteWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod)
 		if err != nil {
 			io.WriteString(w, err.Error())
 			return
 		}
+		fmt.Println("debug2")
 		io.WriteString(w, ret)
+		return
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		fmt.Fprintf(w, "I can't do that.")
