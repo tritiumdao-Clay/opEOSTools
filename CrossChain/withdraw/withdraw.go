@@ -119,20 +119,24 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 	l2 := ethclient.NewClient(l2c)
 	l2g := gethclient.New(l2c)
 
+	fmt.Println("debug20")
 	l2OutputBlock, err := l2oo.LatestBlockNumber(&bind.CallOpts{})
 	if err != nil {
 		return "", err
 	}
 
+	fmt.Println("debug21")
 	l2OutputIndex, err := l2oo.GetL2OutputIndexAfter(&bind.CallOpts{}, l2OutputBlock)
 	if err != nil {
 		return "", err
 	}
 
+	fmt.Println("debug22")
 	header, err := l2.HeaderByNumber(ctx, l2OutputBlock)
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("debug23")
 	params, err := withdrawals.ProveWithdrawalParameters(ctx, l2g, l2, l2TxHash, header, &l2oo.L2OutputOracleCaller)
 	if err != nil {
 		return "", err

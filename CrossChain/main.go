@@ -405,6 +405,7 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 		}
 		ret, err := withdraw.ProveWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash)
 		if err != nil {
+			fmt.Println("debug11")
 			io.WriteString(w, `{"error":"`+err.Error()+`"}`)
 			return
 		}
