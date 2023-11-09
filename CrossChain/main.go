@@ -345,7 +345,6 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserTxHash(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("debug----")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -418,7 +417,6 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 
 func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("debug----")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -444,6 +442,7 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("debug1")
 		ret, err := withdraw.CompleteWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod)
 		if err != nil {
+			fmt.Println("debug11")
 			io.WriteString(w, err.Error())
 			return
 		}
