@@ -32,8 +32,8 @@ type network struct {
 var networks = map[string]network{
 	"opeostest": {
 		l2RPC:         "http://13.228.210.115:8545",
-		portalAddress: "0xf291950Ceb3eacAbA9c27392C0E0665F06769047",
-		l2OOAddress:   "0x026ce1AD5eaeB1caBADE3A445828096e1Ea7A4cf",
+		portalAddress: "0xdd52D429c7c85d2122EbEB3C5808fbf73caBe927",
+		l2OOAddress:   "0xfAEFE87de2A01F26583B3922cfdea6fE2f285641",
 	},
 	"opeos": {
 		l2RPC:         "",
@@ -436,14 +436,14 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("debug0")
 		l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod, err := initWork(dataB)
 		if err != nil {
-			io.WriteString(w, err.Error())
+			io.WriteString(w, wrapError(err.Error()))
 			return
 		}
 		fmt.Println("debug1")
 		ret, err := withdraw.CompleteWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod)
 		if err != nil {
 			fmt.Println("debug11")
-			io.WriteString(w, err.Error())
+			io.WriteString(w, wrapError(err.Error()))
 			return
 		}
 		fmt.Println("debug2")

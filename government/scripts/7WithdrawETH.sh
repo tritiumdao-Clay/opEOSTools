@@ -1,5 +1,5 @@
 source .env
-cast send --rpc-url $L2_RPC --legacy --cast-async --value 1 --private-key $DEPLOYER_PRIVATE_KEY $L2StandardBridgeProxy "withdraw(address, uint256, uint32, bytes)" $ETH_DEAD_ADDR 1 1000000 ""
+#cast send --rpc-url $L2_RPC --legacy --cast-async --value 1 --private-key $DEPLOYER_PRIVATE_KEY $L2StandardBridgeProxy "withdraw(address, uint256, uint32, bytes)" $ETH_DEAD_ADDR 1 1000000 ""
 cast send --rpc-url $L2_RPC --legacy --cast-async --value 1 --private-key $DEPLOYER_PRIVATE_KEY $L2ToL1MessagePasser "initiateWithdrawal(address, uint256, bytes)" $DEPLOYER_ADDR2 1000000 ""
 
 
