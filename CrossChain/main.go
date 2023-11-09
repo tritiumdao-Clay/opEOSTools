@@ -379,8 +379,9 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getFinalizePara(w http.ResponseWriter, r *http.Request) {
+func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("debug0", "getProve")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -415,7 +416,7 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
+func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST":
