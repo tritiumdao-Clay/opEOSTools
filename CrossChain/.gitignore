@@ -1,7 +1,1 @@
 .env
-artifacts
-cache
-node_modules
-
-balance.txt
-balance2.txt

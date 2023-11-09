@@ -1,0 +1,9 @@
+.env
+artifacts
+cache
+node_modules
+
+balance.txt
+balance2.txt
+abi/abigen
+abi/generate_go_file.sh
