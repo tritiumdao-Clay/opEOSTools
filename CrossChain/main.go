@@ -327,8 +327,16 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		dataA := make([]byte, 512)
 		n, _ := r.Body.Read(dataA)
-		dataB := string(dataA[:n])
-		fmt.Println("debug0", dataB)
+		type Req struct {
+			UserAddr string
+		}
+		var req = Req{}
+		err := json.Unmarshal(dataA[:n], &req)
+		if err != nil {
+			io.WriteString(w, `{"error":"parse json fail"}`)
+		}
+		dataB := req.UserAddr
+		//fmt.Println("debug0:", dataB, len(dataB))
 		var userAddr string
 		userAddr = dataB
 		//err := json.Unmarshal(dataA[:n], &userAddr)
@@ -358,9 +366,16 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		dataA := make([]byte, 512)
 		n, _ := r.Body.Read(dataA)
-		dataB := string(dataA[:n])
-		fmt.Println("debug0", dataB)
-		fmt.Println("len(dataB):", len(dataB))
+		type Req struct {
+			WithdrawHash string
+		}
+		var req = Req{}
+		err := json.Unmarshal(dataA[:n], &req)
+		if err != nil {
+			io.WriteString(w, `{"error":"parse json fail"}`)
+		}
+		dataB := req.WithdrawHash
+		//fmt.Println("debug0:", dataB, len(dataB))
 
 		l1, l2c, l2oo, portal, l2TxHash, _, err := initWork(dataB)
 		if err != nil {
@@ -385,9 +400,15 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		dataA := make([]byte, 512)
 		n, _ := r.Body.Read(dataA)
-		dataB := string(dataA[:n])
-		fmt.Println("debug0", dataB)
-		fmt.Println("len(dataB):", len(dataB))
+		type Req struct {
+			WithdrawHash string
+		}
+		var req = Req{}
+		err := json.Unmarshal(dataA[:n], &req)
+		if err != nil {
+			io.WriteString(w, `{"error":"parse json fail"`)
+		}
+		dataB := req.WithdrawHash
 
 		l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod, err := initWork(dataB)
 		if err != nil {
