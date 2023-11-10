@@ -110,7 +110,7 @@ func main() {
 		http.HandleFunc("/getUserTxHash", getUserTxHash)
 
 		log.Println("Go!")
-		http.ListenAndServe(":3000", nil)
+		http.ListenAndServe(":10003", nil)
 	} else {
 		if withdrawalFlag == "" {
 			log.Fatalf("missing --withdrawal flag")
@@ -321,6 +321,7 @@ func wrapSuccess(success string) string {
 }
 
 func writeTxHash(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "POST":
 		pwd, _ := os.Getwd()
@@ -363,6 +364,7 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserTxHash(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
