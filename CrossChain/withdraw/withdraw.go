@@ -193,7 +193,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 	l2 := ethclient.NewClient(l2c)
 	l2g := gethclient.New(l2c)
 
-	fmt.Println("debug30")
+	fmt.Println("debug30, l2TxHash", l2TxHash, len(l2TxHash))
 	receipt, err := l2.TransactionReceipt(ctx, l2TxHash)
 	if err != nil {
 		return "", err
