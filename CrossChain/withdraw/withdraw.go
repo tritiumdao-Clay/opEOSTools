@@ -266,6 +266,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("debug0", string(resBytes))
 	return hex.EncodeToString(resBytes), nil
 }
 
