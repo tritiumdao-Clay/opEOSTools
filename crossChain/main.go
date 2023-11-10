@@ -59,6 +59,18 @@ type WithdrawHashDatabase struct {
 
 var database map[string]WithdrawHashDatabaseItem
 
+func writeFile(path string) error {
+	a, err := json.Marshal(database)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path, a, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func main() {
 	var networkKeys []string
 	for n := range networks {
@@ -103,6 +115,11 @@ func main() {
 		fmt.Println("----------")
 		fmt.Println(database)
 		fmt.Println("----------")
+		err = writeFile(path + time.Now().String())
+		if err != nil {
+			fmt.Println("save database fail")
+			panic(err)
+		}
 
 		http.HandleFunc("/getProveWithdrawalPara", getProveWithdrawalPara)
 		http.HandleFunc("/getFinalizePara", getFinalizePara)
@@ -354,12 +371,11 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 			UserAddr:     res.UserAddr,
 			WithdrawHash: tmp,
 		}
-		a, err := json.Marshal(database)
+		err = writeFile(path)
 		if err != nil {
 			io.WriteString(w, wrapError("write fail"))
 			return
 		}
-		os.WriteFile(path, a, 0644)
 		io.WriteString(w, wrapSuccess("success"))
 		return
 
