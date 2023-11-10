@@ -385,7 +385,11 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, "len(str) is must be 42")
 			return
 		}
-		withdrashHashes := database[userAddr]
+		withdrashHashes, is := database[userAddr]
+		if !is {
+			io.WriteString(w, "no withdraw hash")
+			return
+		}
 		withdrashHashesBytes, err := json.Marshal(withdrashHashes)
 		if err != nil {
 			io.WriteString(w, "internal fail:"+err.Error())
