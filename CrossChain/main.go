@@ -236,6 +236,9 @@ func initWork(withdrawalFlag string) (l1 *ethclient.Client, l2c *rpc.Client, l2o
 	for {
 		l2 := ethclient.NewClient(l2c)
 		fmt.Println("debug00", l2TxHash)
+		if l2 == nil {
+			fmt.Println("debug00, l2 == nil")
+		}
 		receipt, err := l2.TransactionReceipt(ctx, l2TxHash)
 		if err != nil {
 			fmt.Println("debug00", err.Error())
