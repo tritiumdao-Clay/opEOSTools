@@ -241,6 +241,7 @@ func initWork(withdrawalFlag string) (l1 *ethclient.Client, l2c *rpc.Client, l2o
 			fmt.Println("debug00", err.Error())
 			break
 		}
+		fmt.Println("debug01")
 		fmt.Println("debug01", receipt.BlockHash)
 	}
 
@@ -394,7 +395,6 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 
 func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("debug0", "getProve")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -440,7 +440,7 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 			WithdrawHash string
 		}
 		var req = Req{}
-		fmt.Println("debug0:", string(dataA), len(dataA))
+		//fmt.Println("debug0:", string(dataA), len(dataA))
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
 			io.WriteString(w, `{"error":"parse json fail"}`)
@@ -448,7 +448,6 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 		}
 		dataB := req.WithdrawHash
 
-		fmt.Println("debug0")
 		l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod, err := initWork(dataB)
 		if err != nil {
 			io.WriteString(w, wrapError(err.Error()))
