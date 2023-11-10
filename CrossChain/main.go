@@ -416,7 +416,7 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 		var req = Req{}
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
-			io.WriteString(w, `{"error":"parse json fail"}`)
+			io.WriteString(w, wrapError(`{"error":"parse json fail"}`))
 			return
 		}
 		dataB := req.WithdrawHash
@@ -424,13 +424,13 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 
 		l1, l2c, l2oo, portal, l2TxHash, _, err := initWork(dataB)
 		if err != nil {
-			io.WriteString(w, err.Error())
+			io.WriteString(w, wrapError(err.Error()))
 			return
 		}
 		ret, err := withdraw.ProveWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash)
 		if err != nil {
 			fmt.Println("debug11")
-			io.WriteString(w, `{"error":"`+err.Error()+`"}`)
+			io.WriteString(w, wrapError(err.Error()))
 			return
 		}
 		io.WriteString(w, ret)
@@ -455,7 +455,7 @@ func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println("debug0:", string(dataA), len(dataA))
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
-			io.WriteString(w, `{"error":"parse json fail"}`)
+			io.WriteString(w, wrapError(`{"error":"parse json fail"}`))
 			return
 		}
 		dataB := req.WithdrawHash
