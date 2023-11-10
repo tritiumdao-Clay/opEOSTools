@@ -375,24 +375,24 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 		var req = Req{}
 		err := json.Unmarshal(dataA[:n], &req)
 		if err != nil {
-			io.WriteString(w, `{"error":"parse json fail"}`)
+			io.WriteString(w, wrapError(`{"error":"parse json fail"}`))
 			return
 		}
 		dataB := req.UserAddr
 		var userAddr string
 		userAddr = dataB
 		if len(userAddr) != 42 {
-			io.WriteString(w, "len(str) is must be 42")
+			io.WriteString(w, wrapError("len(str) is must be 42"))
 			return
 		}
 		withdrashHashes, is := database[userAddr]
 		if !is {
-			io.WriteString(w, "no withdraw hash")
+			io.WriteString(w, wrapError("no withdraw hash"))
 			return
 		}
 		withdrashHashesBytes, err := json.Marshal(withdrashHashes)
 		if err != nil {
-			io.WriteString(w, "internal fail:"+err.Error())
+			io.WriteString(w, wrapError("internal fail:"+err.Error()))
 			return
 		}
 		w.Write(withdrashHashesBytes)
