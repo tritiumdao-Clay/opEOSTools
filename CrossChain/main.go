@@ -246,6 +246,7 @@ func initWork(withdrawalFlag string) (l1 *ethclient.Client, l2c *rpc.Client, l2o
 		}
 		fmt.Println("debug01")
 		fmt.Println("debug01", receipt.BlockHash)
+		break
 	}
 
 	portal, err = bindings.NewOptimismPortal(common.HexToAddress(n.portalAddress), l1Client)
