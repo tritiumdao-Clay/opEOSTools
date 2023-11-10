@@ -2,6 +2,7 @@ package withdraw
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -148,20 +149,24 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 		Target   common.Address `json:"target"`
 		Value    *big.Int       `json:"value"`
 		GasLimit *big.Int       `json:"gasLimit"`
-		Data     []byte         `json:"data"`
+		Data     string         `json:"data"`
 	}
 	type outputRootProof struct {
-		Version                  [32]byte `json:"version"`
-		StateRoot                [32]byte `json:"stateRoot"`
-		MessagePasserStorageRoot [32]byte `json:"MessagePasserStorageRoot"`
-		LatestBlockhash          [32]byte `json:"latestBlockhash"`
+		Version                  string `json:"version"`
+		StateRoot                string `json:"stateRoot"`
+		MessagePasserStorageRoot string `json:"MessagePasserStorageRoot"`
+		LatestBlockhash          string `json:"latestBlockhash"`
 	}
 
+	var tmpStrArray []string
+	for _, item := range params.WithdrawalProof {
+		tmpStrArray = append(tmpStrArray, hex.EncodeToString(item))
+	}
 	var res = struct {
 		TypesWithdrawalTransaction typesWithdrawalTransaction `json:"typesWithdrawalTransaction"`
 		L2OutputIndex              *big.Int                   `json:"l2OutputIndex"`
 		OutputRootProof            outputRootProof            `json:"outputRootProof"`
-		WithdrawalProof            [][]byte                   `json:"withdrawalProof"`
+		WithdrawalProof            []string                   `json:"withdrawalProof"`
 	}{
 		TypesWithdrawalTransaction: typesWithdrawalTransaction{
 			Nonce:    params.Nonce,
@@ -169,16 +174,16 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 			Target:   params.Target,
 			Value:    params.Value,
 			GasLimit: params.GasLimit,
-			Data:     params.Data,
+			Data:     hex.EncodeToString(params.Data),
 		},
 		L2OutputIndex: l2OutputIndex,
 		OutputRootProof: outputRootProof{
-			Version:                  params.OutputRootProof.Version,
-			StateRoot:                params.OutputRootProof.StateRoot,
-			MessagePasserStorageRoot: params.OutputRootProof.MessagePasserStorageRoot,
-			LatestBlockhash:          params.OutputRootProof.LatestBlockhash,
+			Version:                  hex.EncodeToString(params.OutputRootProof.Version[:]),
+			StateRoot:                hex.EncodeToString(params.OutputRootProof.StateRoot[:]),
+			MessagePasserStorageRoot: hex.EncodeToString(params.OutputRootProof.MessagePasserStorageRoot[:]),
+			LatestBlockhash:          hex.EncodeToString(params.OutputRootProof.LatestBlockhash[:]),
 		},
-		WithdrawalProof: params.WithdrawalProof,
+		WithdrawalProof: tmpStrArray,
 	}
 
 	resBytes, err := json.Marshal(res)
@@ -248,7 +253,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 		Target   common.Address `json:"target"`
 		Value    *big.Int       `json:"value"`
 		GasLimit *big.Int       `json:"gasLimit"`
-		Data     []byte         `json:"data"`
+		Data     string         `json:"data"`
 	}
 
 	var res = typesWithdrawalTransaction{
@@ -257,7 +262,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 		Target:   params.Target,
 		Value:    params.Value,
 		GasLimit: params.GasLimit,
-		Data:     params.Data,
+		Data:     hex.EncodeToString(params.Data),
 	}
 
 	resBytes, err := json.Marshal(res)

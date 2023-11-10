@@ -343,6 +343,12 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 		}
 
 		tmp := database[res.UserAddr].WithdrawHash
+		for _, item := range tmp {
+			if item == res.WithdrawHash {
+				io.WriteString(w, wrapError("already contain this withdraw hash"))
+				return
+			}
+		}
 		tmp = append(tmp, res.WithdrawHash)
 		database[res.UserAddr] = WithdrawHashDatabaseItem{
 			UserAddr:     res.UserAddr,
