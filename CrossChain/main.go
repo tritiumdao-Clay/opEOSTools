@@ -220,6 +220,7 @@ func initWork(withdrawalFlag string) (l1 *ethclient.Client, l2c *rpc.Client, l2o
 		return nil, nil, nil, nil, common.Hash{}, nil, errors.New("withdrawHash is invalid")
 	}
 	withdrawal := common.HexToHash(withdrawalFlag)
+	l2TxHash = withdrawal
 
 	ctx := context.Background()
 	l1Client, err := ethclient.DialContext(ctx, rpcFlag)
