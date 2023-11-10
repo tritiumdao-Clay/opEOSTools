@@ -234,7 +234,7 @@ func initWork(withdrawalFlag string) (l1 *ethclient.Client, l2c *rpc.Client, l2o
 	}
 
 	for {
-		l2 := ethclient.NewClient(l2c)
+		l2 := ethclient.NewClient(l2Client)
 		fmt.Println("debug00", l2TxHash)
 		if l2 == nil {
 			fmt.Println("debug00, l2 == nil")
