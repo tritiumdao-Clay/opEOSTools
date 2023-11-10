@@ -2,7 +2,6 @@ package withdraw
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -187,8 +186,7 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 		return "", err
 	}
 
-	fmt.Println("debug0", string(resBytes))
-	return hex.EncodeToString(resBytes), nil
+	return string(resBytes), nil
 }
 
 func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client, l2oo *bindings.L2OutputOracle, portal *bindings.OptimismPortal, l2TxHash common.Hash, finalizationPeriod *big.Int) (string, error) {
@@ -266,8 +264,7 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("debug0", string(resBytes))
-	return hex.EncodeToString(resBytes), nil
+	return string(resBytes), nil
 }
 
 func CompleteWithdrawal(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client, l2oo *bindings.L2OutputOracle, portal *bindings.OptimismPortal, l2TxHash common.Hash, finalizationPeriod *big.Int, opts *bind.TransactOpts) error {
