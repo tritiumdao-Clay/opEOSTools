@@ -86,5 +86,5 @@ func main() {
         http.HandleFunc("/", tomHandler)
 
         log.Println("Go!")
-        http.ListenAndServe(":8080", nil)
+        http.ListenAndServe(":10002", nil)
 }
