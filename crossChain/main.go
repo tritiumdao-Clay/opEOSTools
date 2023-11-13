@@ -339,6 +339,10 @@ func wrapSuccess(success string) string {
 
 func writeTxHash(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 	switch r.Method {
 	case "POST":
 		pwd, _ := os.Getwd()
@@ -387,6 +391,10 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 
 func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -428,6 +436,10 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
@@ -466,6 +478,10 @@ func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
 func getFinalizePara(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 	switch r.Method {
 	case "POST":
 		dataA := make([]byte, 512)
