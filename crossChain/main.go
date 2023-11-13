@@ -425,6 +425,7 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, wrapError("internal fail:"+err.Error()))
 			return
 		}
+		w.WriteHeader(200)
 		w.Write(withdrashHashesBytes)
 		return
 	default:
