@@ -48,6 +48,10 @@ module.exports = {
       url: `${process.env.L2_RPC}`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],
     },
+    opeostest: {
+      url: `https://testnet-rpc.opeos.io/`,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY],
+    },
     eosevm: {
       url: `https://api.evm.eosnetwork.com`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],
