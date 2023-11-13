@@ -392,8 +392,9 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Max-Age", "86400")
 	switch r.Method {
 	case "POST":
@@ -425,7 +426,6 @@ func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, wrapError("internal fail:"+err.Error()))
 			return
 		}
-		w.WriteHeader(200)
 		w.Write(withdrashHashesBytes)
 		return
 	default:
