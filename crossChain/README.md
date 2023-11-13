@@ -1,0 +1,1 @@
+go run main.go --rpc $L1_RPC --network opeostest --start-http false --private-key $KEY --withdrawal $TXHASH
