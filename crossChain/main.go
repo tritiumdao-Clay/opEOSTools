@@ -131,7 +131,7 @@ func main() {
 		// 设置cors中间件
 		r.Use(cors.New(config))
 
-		r.POST("/getProveWithdrawalPara", getUserTxHash)
+		r.POST("/getUserTxHash", getUserTxHash)
 
 		r.Run(":10003")
 
