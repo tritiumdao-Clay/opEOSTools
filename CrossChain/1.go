@@ -14,6 +14,7 @@ func main() {
 	config.AllowOrigins = []string{"http://localhost:10003"}                   // 允许什么域名访问，支持多个域名
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}  // 允许的 HTTP 方法
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"} // 允许的 HTTP 头
+	config.AllowCredentials = true
 	// 设置cors中间件
 	r.Use(cors.New(config))
 
