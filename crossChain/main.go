@@ -391,8 +391,8 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 
 func getUserTxHash(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	origin := r.Header.Get("Origin")
-	w.Header().Set("Access-Control-Allow-Origin", origin)
+	//origin := r.Header.Get("Origin")
+	w.Header().Set("Access-Control-Allow-Origin", "localhost:3000")
 	//w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token,X-Token,X-User-Id,X-Requested-With")
