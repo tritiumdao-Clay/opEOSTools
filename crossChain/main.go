@@ -132,15 +132,11 @@ func main() {
 		r.Use(cors.New(config))
 
 		r.POST("/getUserTxHash", getUserTxHash)
+		r.POST("/writeTxHash", writeTxHash)
+		r.POST("/getProveWithdrawalPara", getProveWithdrawalPara)
+		r.POST("/getFinalizePara", getFinalizePara)
 
 		r.Run(":10003")
-
-		//http.HandleFunc("/getProveWithdrawalPara", getProveWithdrawalPara)
-		//http.HandleFunc("/getFinalizePara", getFinalizePara)
-		//http.HandleFunc("/writeTxHash", writeTxHash)
-
-		//log.Println("Go!")
-		//http.ListenAndServe(":10003", nil)
 	} else {
 		if withdrawalFlag == "" {
 			log.Fatalf("missing --withdrawal flag")
@@ -350,56 +346,43 @@ func wrapSuccess(success string) string {
 	return string(ret)
 }
 
-func writeTxHash(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
-	w.Header().Set("Access-Control-Max-Age", "86400")
-	switch r.Method {
-	case "POST":
-		pwd, _ := os.Getwd()
-		path := pwd + "/datadir/withrawHash.json"
-		fmt.Println("path:", path)
-
-		dataA := make([]byte, 512)
-		n, _ := r.Body.Read(dataA)
-		dataB := string(dataA[:n])
-		type Resp struct {
-			UserAddr     string `json:"userAddr"`
-			WithdrawHash string `json:"withdrawHash"`
-		}
-		var res = Resp{}
-		err := json.Unmarshal([]byte(dataB), &res)
-		if err != nil {
-			io.WriteString(w, wrapError("parse json fail. req:"+dataB))
-			return
-		}
-
-		tmp := database[res.UserAddr].WithdrawHash
-		for _, item := range tmp {
-			if item == res.WithdrawHash {
-				io.WriteString(w, wrapError("already contain this withdraw hash"))
-				return
-			}
-		}
-		tmp = append(tmp, res.WithdrawHash)
-		database[res.UserAddr] = WithdrawHashDatabaseItem{
-			UserAddr:     res.UserAddr,
-			WithdrawHash: tmp,
-		}
-		err = writeFile(path)
-		if err != nil {
-			io.WriteString(w, wrapError("write fail"))
-			return
-		}
-		io.WriteString(w, wrapSuccess("success"))
-		return
-
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		io.WriteString(w, wrapError("I can't do that"))
+func writeTxHash(c *gin.Context) {
+	pwd, _ := os.Getwd()
+	path := pwd + "/datadir/withrawHash.json"
+	fmt.Println("path:", path)
+	type Resp struct {
+		UserAddr     string `json:"userAddr"`
+		WithdrawHash string `json:"withdrawHash"`
 	}
+	var res = Resp{}
+	c.Header("Content-Type", "application/json")
+
+	dataB, err := c.GetRawData()
+	err = json.Unmarshal(dataB, &res)
+	if err != nil {
+		c.String(200, wrapError("parse json fail. req:"+string(dataB)))
+		return
+	}
+
+	tmp := database[res.UserAddr].WithdrawHash
+	for _, item := range tmp {
+		if item == res.WithdrawHash {
+			c.String(200, wrapError("already contain this withdraw hash"))
+			return
+		}
+	}
+	tmp = append(tmp, res.WithdrawHash)
+	database[res.UserAddr] = WithdrawHashDatabaseItem{
+		UserAddr:     res.UserAddr,
+		WithdrawHash: tmp,
+	}
+	err = writeFile(path)
+	if err != nil {
+		c.String(200, wrapError("write fail"))
+		return
+	}
+	c.String(200, wrapSuccess("success"))
+	return
 }
 
 func getUserTxHash(c *gin.Context) {
@@ -407,6 +390,7 @@ func getUserTxHash(c *gin.Context) {
 		UserAddr string
 	}
 	var req = Req{}
+	c.Header("Content-Type", "application/json")
 
 	dataA, err := c.GetRawData()
 	err = json.Unmarshal(dataA, &req)
@@ -435,88 +419,62 @@ func getUserTxHash(c *gin.Context) {
 	return
 }
 
-func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
+func getProveWithdrawalPara(c *gin.Context) {
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
-	w.Header().Set("Access-Control-Max-Age", "86400")
-	switch r.Method {
-	case "POST":
-		dataA := make([]byte, 512)
-		n, _ := r.Body.Read(dataA)
-		type Req struct {
-			WithdrawHash string
-		}
-		var req = Req{}
-		err := json.Unmarshal(dataA[:n], &req)
-		if err != nil {
-			io.WriteString(w, wrapError(`{"error":"parse json fail"}`))
-			return
-		}
-		dataB := req.WithdrawHash
-		//fmt.Println("debug0:", dataB, len(dataB))
-
-		l1, l2c, l2oo, portal, l2TxHash, _, err := initWork(dataB)
-		if err != nil {
-			io.WriteString(w, wrapError(err.Error()))
-			return
-		}
-		ret, err := withdraw.ProveWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash)
-		if err != nil {
-			fmt.Println("debug11")
-			io.WriteString(w, wrapError(err.Error()))
-			return
-		}
-		io.WriteString(w, ret)
-		return
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Fprintf(w, "I can't do that.")
+	type Req struct {
+		WithdrawHash string
 	}
+	var req = Req{}
+	c.Header("Content-Type", "application/json")
+
+	dataA, err := c.GetRawData()
+	err = json.Unmarshal(dataA, &req)
+	if err != nil {
+		c.String(200, wrapError(`{"error":"parse json fail"}`))
+		return
+	}
+	dataB := req.WithdrawHash
+	//fmt.Println("debug0:", dataB, len(dataB))
+
+	l1, l2c, l2oo, portal, l2TxHash, _, err := initWork(dataB)
+	if err != nil {
+		c.String(200, wrapError(err.Error())
+		return
+	}
+	ret, err := withdraw.ProveWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash)
+	if err != nil {
+		c.String(200, wrapError(err.Error()))
+		return
+	}
+	c.String(200, ret)
+	return
 }
 
-func getFinalizePara(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
-	w.Header().Set("Access-Control-Max-Age", "86400")
-	switch r.Method {
-	case "POST":
-		dataA := make([]byte, 512)
-		n, _ := r.Body.Read(dataA)
-		type Req struct {
-			WithdrawHash string
-		}
-		var req = Req{}
-		//fmt.Println("debug0:", string(dataA), len(dataA))
-		err := json.Unmarshal(dataA[:n], &req)
-		if err != nil {
-			io.WriteString(w, wrapError(`{"error":"parse json fail"}`))
-			return
-		}
-		dataB := req.WithdrawHash
-
-		l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod, err := initWork(dataB)
-		if err != nil {
-			io.WriteString(w, wrapError(err.Error()))
-			return
-		}
-		fmt.Println("debug1")
-		ret, err := withdraw.CompleteWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod)
-		if err != nil {
-			fmt.Println("debug11")
-			io.WriteString(w, wrapError(err.Error()))
-			return
-		}
-		fmt.Println("debug2")
-		io.WriteString(w, ret)
-		return
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Fprintf(w, "I can't do that.")
+func getFinalizePara(c *gin.Context) {
+	type Req struct {
+		WithdrawHash string
 	}
+	var req = Req{}
+	c.Header("Content-Type", "application/json")
+	//fmt.Println("debug0:", string(dataA), len(dataA))
+
+	dataA, err := c.GetRawData()
+	err = json.Unmarshal(dataA, &req)
+	if err != nil {
+		c.String(200, wrapError(`{"error":"parse json fail"}`))
+		return
+	}
+	dataB := req.WithdrawHash
+
+	l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod, err := initWork(dataB)
+	if err != nil {
+		c.String(200, wrapError(err.Error()))
+		return
+	}
+	ret, err := withdraw.CompleteWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash, finalizationPeriod)
+	if err != nil {
+		c.String(200, wrapError(err.Error()))
+		return
+	}
+	c.String(200, ret)
 }
