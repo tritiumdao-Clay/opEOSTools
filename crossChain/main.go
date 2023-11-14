@@ -7,10 +7,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-contrib/cors"
-	"io"
 	"log"
 	"math/big"
-	"net/http"
 	"os"
 	"time"
 
@@ -438,7 +436,7 @@ func getProveWithdrawalPara(c *gin.Context) {
 
 	l1, l2c, l2oo, portal, l2TxHash, _, err := initWork(dataB)
 	if err != nil {
-		c.String(200, wrapError(err.Error())
+		c.String(200, wrapError(err.Error()))
 		return
 	}
 	ret, err := withdraw.ProveWithdrawal2(context.Background(), l1, l2c, l2oo, portal, l2TxHash)
