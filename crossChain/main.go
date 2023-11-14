@@ -30,9 +30,9 @@ type network struct {
 
 var networks = map[string]network{
 	"opeostest": {
-		l2RPC:         "http://13.228.210.115:8545",
-		portalAddress: "0xdd52D429c7c85d2122EbEB3C5808fbf73caBe927",
-		l2OOAddress:   "0xfAEFE87de2A01F26583B3922cfdea6fE2f285641",
+		l2RPC:         "https://testnet-rpc.opeos.io",
+		portalAddress: "0x70d544de5f1c7C4a9f09a82a07eB8F360B040169",
+		l2OOAddress:   "0xB28aF3ac0c2847DE28345bb3b821dd8744f6fC6F",
 	},
 	"opeos": {
 		l2RPC:         "",
