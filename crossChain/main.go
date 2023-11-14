@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"io"
 	"log"
 	"math/big"
@@ -13,14 +14,14 @@ import (
 	"os"
 	"time"
 
+	"crossChain/prove/signer"
+	"crossChain/prove/withdraw"
 	"github.com/ethereum-optimism/optimism/op-bindings/bindings"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
-
-	"crossChain/prove/signer"
-	"crossChain/prove/withdraw"
+	"github.com/gin-gonic/gin"
 )
 
 type network struct {
@@ -121,13 +122,25 @@ func main() {
 			panic(err)
 		}
 
-		http.HandleFunc("/getProveWithdrawalPara", getProveWithdrawalPara)
-		http.HandleFunc("/getFinalizePara", getFinalizePara)
-		http.HandleFunc("/writeTxHash", writeTxHash)
-		http.HandleFunc("/getUserTxHash", getUserTxHash)
+		r := gin.Default()
+		config := cors.DefaultConfig()
+		config.AllowOrigins = []string{"*"}                                        // 允许什么域名访问，支持多个域名
+		config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}  // 允许的 HTTP 方法
+		config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"} // 允许的 HTTP 头
+		config.AllowCredentials = true
+		// 设置cors中间件
+		r.Use(cors.New(config))
 
-		log.Println("Go!")
-		http.ListenAndServe(":10003", nil)
+		r.POST("/getProveWithdrawalPara", getUserTxHash)
+
+		r.Run(":10003")
+
+		//http.HandleFunc("/getProveWithdrawalPara", getProveWithdrawalPara)
+		//http.HandleFunc("/getFinalizePara", getFinalizePara)
+		//http.HandleFunc("/writeTxHash", writeTxHash)
+
+		//log.Println("Go!")
+		//http.ListenAndServe(":10003", nil)
 	} else {
 		if withdrawalFlag == "" {
 			log.Fatalf("missing --withdrawal flag")
@@ -389,52 +402,37 @@ func writeTxHash(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUserTxHash(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	//origin := r.Header.Get("Origin")
-	w.Header().Set("Access-Control-Allow-Origin", "localhost:3000")
-	//w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token,X-Token,X-User-Id,X-Requested-With")
-	w.Header().Set("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Max-Age", "86400")
-	switch r.Method {
-	case "POST":
-		dataA := make([]byte, 512)
-		n, _ := r.Body.Read(dataA)
-		type Req struct {
-			UserAddr string
-		}
-		var req = Req{}
-		err := json.Unmarshal(dataA[:n], &req)
-		if err != nil {
-			io.WriteString(w, wrapError(`{"error":"parse json fail"}`))
-			return
-		}
-		dataB := req.UserAddr
-		var userAddr string
-		userAddr = dataB
-		if len(userAddr) != 42 {
-			io.WriteString(w, wrapError("len(str) is must be 42"))
-			return
-		}
-		withdrashHashes, is := database[userAddr]
-		if !is {
-			io.WriteString(w, wrapError("no withdraw hash"))
-			return
-		}
-		withdrashHashesBytes, err := json.Marshal(withdrashHashes)
-		if err != nil {
-			io.WriteString(w, wrapError("internal fail:"+err.Error()))
-			return
-		}
-		w.Write(withdrashHashesBytes)
-		return
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Fprintf(w, "I can't do that.")
+func getUserTxHash(c *gin.Context) {
+	type Req struct {
+		UserAddr string
 	}
+	var req = Req{}
+
+	dataA, err := c.GetRawData()
+	err = json.Unmarshal(dataA, &req)
+	if err != nil {
+		c.String(200, wrapError(`{"error":"parse json fail"}`))
+		return
+	}
+	dataB := req.UserAddr
+	var userAddr string
+	userAddr = dataB
+	if len(userAddr) != 42 {
+		c.String(200, wrapError("len(str) is must be 42"))
+		return
+	}
+	withdrashHashes, is := database[userAddr]
+	if !is {
+		c.String(200, wrapError("no withdraw hash"))
+		return
+	}
+	withdrashHashesBytes, err := json.Marshal(withdrashHashes)
+	if err != nil {
+		c.String(200, wrapError("internal fail:"+err.Error()))
+		return
+	}
+	c.Data(200, "application/json", withdrashHashesBytes)
+	return
 }
 
 func getProveWithdrawalPara(w http.ResponseWriter, r *http.Request) {
