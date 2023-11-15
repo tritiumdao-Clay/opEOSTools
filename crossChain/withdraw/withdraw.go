@@ -185,6 +185,13 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 		},
 		WithdrawalProof: tmpStrArray,
 	}
+	fmt.Println("------------------------------------------------")
+	fmt.Println("transactionData:", params.Data)
+	fmt.Println("stateRoot:", params.OutputRootProof.StateRoot)
+	fmt.Println("MPSR:", params.OutputRootProof.MessagePasserStorageRoot)
+	fmt.Println("latestBlockHash:", params.OutputRootProof.LatestBlockhash)
+	fmt.Println("withdrawProof:", params.WithdrawalProof)
+	fmt.Println("------------------------------------------------")
 
 	resBytes, err := json.Marshal(res)
 	if err != nil {
