@@ -134,6 +134,7 @@ func main() {
 
 		r.POST("/getL1ToL2Hash", getL1ToL2Hash)
 		r.POST("/getL2ToL1Hash", getL2ToL1Hash)
+		r.POST("/writel1ToL2Hash", writeL1ToL2Hash)
 		r.POST("/writeWithdrawHash", writeWithdrawHash)
 		r.POST("/writeProveHash", writeProveHash)
 		r.POST("/writeFinalizeHash", writeFinalizeHash)
@@ -439,6 +440,49 @@ func writeProveHash(c *gin.Context) {
 	return
 }
 
+func writeL1ToL2Hash(c *gin.Context) {
+	pwd, _ := os.Getwd()
+	path := pwd + "/datadir/withrawHash.json"
+	fmt.Println("path:", path)
+	type Resp struct {
+		UserAddr     string `json:"userAddr"`
+		WithdrawHash string `json:"txHash"`
+	}
+	var res = Resp{}
+	c.Header("Content-Type", "application/json")
+
+	dataB, err := c.GetRawData()
+	err = json.Unmarshal(dataB, &res)
+	if err != nil {
+		c.String(200, wrapError("parse json fail. req:"+string(dataB)))
+		return
+	}
+
+	tmp := database[res.UserAddr].L1ToL2Hash
+	for _, item := range tmp {
+		if item == res.WithdrawHash {
+			c.String(200, wrapError("already contain this withdraw hash"))
+			return
+		}
+	}
+	tmp = append(tmp, res.WithdrawHash)
+	database[res.UserAddr] = WithdrawHashDatabaseItem{
+		UserAddr:   res.UserAddr,
+		L1ToL2Hash: tmp,
+		L2ToL1Hash: L2ToL1{
+			WithdrawHash: database[res.UserAddr].L2ToL1Hash.WithdrawHash,
+			ProveHash:    database[res.UserAddr].L2ToL1Hash.ProveHash,
+			FinalizeHash: database[res.UserAddr].L2ToL1Hash.FinalizeHash,
+		},
+	}
+	err = writeFile(path)
+	if err != nil {
+		c.String(200, wrapError("write fail"))
+		return
+	}
+	c.String(200, wrapSuccess("success"))
+	return
+}
 func writeWithdrawHash(c *gin.Context) {
 	pwd, _ := os.Getwd()
 	path := pwd + "/datadir/withrawHash.json"
