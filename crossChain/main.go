@@ -134,7 +134,7 @@ func main() {
 
 		r.POST("/getL1ToL2Hash", getL1ToL2Hash)
 		r.POST("/getL2ToL1Hash", getL2ToL1Hash)
-		r.POST("/writel1ToL2Hash", writeL1ToL2Hash)
+		r.POST("/writeL1ToL2Hash", writeL1ToL2Hash)
 		r.POST("/writeWithdrawHash", writeWithdrawHash)
 		r.POST("/writeProveHash", writeProveHash)
 		r.POST("/writeFinalizeHash", writeFinalizeHash)
