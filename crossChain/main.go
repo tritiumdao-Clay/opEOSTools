@@ -559,7 +559,7 @@ func getL1ToL2Hash(c *gin.Context) {
 		return
 	}
 	withdrashHashesBytes, err := json.Marshal(struct {
-		L1ToL2 []string `json:"l1ToL2Hash"`
+		L1ToL2 []Hash `json:"l1ToL2Hash"`
 	}{
 		L1ToL2: withdrashHashes.L1ToL2Hash,
 	})
