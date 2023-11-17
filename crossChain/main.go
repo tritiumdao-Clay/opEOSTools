@@ -54,15 +54,15 @@ type Hash struct {
 }
 
 type L2ToL1 struct {
-	WithdrawHash []Hash `json:"l2ToL1WithdrawHash"`
-	ProveHash    []Hash `json:"l2ToL1ProveHash"`
-	FinalizeHash []Hash `json:"l2ToL1FinalizeHash"`
+	WithdrawHash Hash `json:"l2ToL1WithdrawHash"`
+	ProveHash    Hash `json:"l2ToL1ProveHash"`
+	FinalizeHash Hash `json:"l2ToL1FinalizeHash"`
 }
 
 type WithdrawHashDatabaseItem struct {
-	UserAddr   string `json:"userAddr"`
-	L1ToL2Hash []Hash `json:"l1ToL2Hash"`
-	L2ToL1Hash L2ToL1 `json:"l2ToL1Hash"`
+	UserAddr   string   `json:"userAddr"`
+	L1ToL2Hash []Hash   `json:"l1ToL2Hash"`
+	L2ToL1Hash []L2ToL1 `json:"l2ToL1Hash"`
 }
 
 var database map[string]WithdrawHashDatabaseItem
@@ -365,6 +365,7 @@ func writeFinalizeHash(c *gin.Context) {
 	type Resp struct {
 		UserAddr     string `json:"userAddr"`
 		WithdrawHash Hash   `json:"txHash"`
+		Hash         string `json:"withdrawHash"`
 	}
 	var res = Resp{}
 	c.Header("Content-Type", "application/json")
@@ -376,22 +377,28 @@ func writeFinalizeHash(c *gin.Context) {
 		return
 	}
 
-	tmp := database[res.UserAddr].L2ToL1Hash.FinalizeHash
-	for _, item := range tmp {
-		if item == res.WithdrawHash || item.TxHash == res.WithdrawHash.TxHash {
+	const NEGATIVE_ONE = -1
+	var index = NEGATIVE_ONE
+	tmp := database[res.UserAddr].L2ToL1Hash
+	for i, item := range tmp {
+		if item.FinalizeHash == res.WithdrawHash || item.FinalizeHash.TxHash == res.WithdrawHash.TxHash {
 			c.String(200, wrapError("already contain this withdraw hash"))
 			return
 		}
+		if item.WithdrawHash.TxHash == res.Hash {
+			index = i
+			break
+		}
 	}
-	tmp = append(tmp, res.WithdrawHash)
+	if NEGATIVE_ONE == index {
+		c.String(200, wrapError("this withdraw hash isn't exist"))
+		return
+	}
+	tmp[index].FinalizeHash = res.WithdrawHash
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
 		UserAddr:   res.UserAddr,
 		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
-		L2ToL1Hash: L2ToL1{
-			WithdrawHash: database[res.UserAddr].L2ToL1Hash.WithdrawHash,
-			ProveHash:    database[res.UserAddr].L2ToL1Hash.ProveHash,
-			FinalizeHash: tmp,
-		},
+		L2ToL1Hash: tmp,
 	}
 	err = writeFile(path)
 	if err != nil {
@@ -409,6 +416,7 @@ func writeProveHash(c *gin.Context) {
 	type Resp struct {
 		UserAddr     string `json:"userAddr"`
 		WithdrawHash Hash   `json:"txHash"`
+		Hash         string `json:"withdrawHash"`
 	}
 	var res = Resp{}
 	c.Header("Content-Type", "application/json")
@@ -420,22 +428,29 @@ func writeProveHash(c *gin.Context) {
 		return
 	}
 
-	tmp := database[res.UserAddr].L2ToL1Hash.ProveHash
-	for _, item := range tmp {
-		if item == res.WithdrawHash || item.TxHash == res.WithdrawHash.TxHash {
+	tmp := database[res.UserAddr].L2ToL1Hash
+
+	const NEGATIVE_ONE = -1
+	var index = NEGATIVE_ONE
+	for i, item := range tmp {
+		if item.ProveHash == res.WithdrawHash || item.ProveHash.TxHash == res.WithdrawHash.TxHash {
 			c.String(200, wrapError("already contain this withdraw hash"))
 			return
 		}
+		if item.WithdrawHash.TxHash == res.Hash {
+			index = i
+			break
+		}
 	}
-	tmp = append(tmp, res.WithdrawHash)
+	if NEGATIVE_ONE == index {
+		c.String(200, wrapError("this withdraw hash isn't exist"))
+		return
+	}
+	tmp[index].ProveHash = res.WithdrawHash
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
 		UserAddr:   res.UserAddr,
 		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
-		L2ToL1Hash: L2ToL1{
-			WithdrawHash: database[res.UserAddr].L2ToL1Hash.WithdrawHash,
-			ProveHash:    tmp,
-			FinalizeHash: database[res.UserAddr].L2ToL1Hash.FinalizeHash,
-		},
+		L2ToL1Hash: tmp,
 	}
 	err = writeFile(path)
 	if err != nil {
@@ -475,11 +490,7 @@ func writeL1ToL2Hash(c *gin.Context) {
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
 		UserAddr:   res.UserAddr,
 		L1ToL2Hash: tmp,
-		L2ToL1Hash: L2ToL1{
-			WithdrawHash: database[res.UserAddr].L2ToL1Hash.WithdrawHash,
-			ProveHash:    database[res.UserAddr].L2ToL1Hash.ProveHash,
-			FinalizeHash: database[res.UserAddr].L2ToL1Hash.FinalizeHash,
-		},
+		L2ToL1Hash: database[res.UserAddr].L2ToL1Hash,
 	}
 	err = writeFile(path)
 	if err != nil {
@@ -507,22 +518,20 @@ func writeWithdrawHash(c *gin.Context) {
 		return
 	}
 
-	tmp := database[res.UserAddr].L2ToL1Hash.WithdrawHash
+	tmp := database[res.UserAddr].L2ToL1Hash
 	for _, item := range tmp {
-		if item == res.WithdrawHash || item.TxHash == res.WithdrawHash.TxHash {
+		if item.WithdrawHash == res.WithdrawHash || item.WithdrawHash.TxHash == res.WithdrawHash.TxHash {
 			c.String(200, wrapError("already contain this withdraw hash"))
 			return
 		}
 	}
-	tmp = append(tmp, res.WithdrawHash)
+	tmp = append(tmp, L2ToL1{
+		WithdrawHash: res.WithdrawHash,
+	})
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
 		UserAddr:   res.UserAddr,
 		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
-		L2ToL1Hash: L2ToL1{
-			WithdrawHash: tmp,
-			ProveHash:    database[res.UserAddr].L2ToL1Hash.ProveHash,
-			FinalizeHash: database[res.UserAddr].L2ToL1Hash.FinalizeHash,
-		},
+		L2ToL1Hash: tmp,
 	}
 	err = writeFile(path)
 	if err != nil {
@@ -597,7 +606,7 @@ func getL2ToL1Hash(c *gin.Context) {
 		return
 	}
 	withdrashHashesBytes, err := json.Marshal(struct {
-		L2ToL1 L2ToL1 `json:"l2ToL1Hash"`
+		L2ToL1 []L2ToL1 `json:"l2ToL1Hash"`
 	}{
 		L2ToL1: withdrashHashes.L2ToL1Hash,
 	})
