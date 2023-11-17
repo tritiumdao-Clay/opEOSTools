@@ -47,13 +47,16 @@ var withdrawalFlag string
 var privateKey string
 var startHTTP bool
 
-type WithdrawHashDatabaseItem struct {
-	UserAddr     string   `json:"userAddr"`
-	WithdrawHash []string `json:"withdrawHash"`
+type L2ToL1 struct {
+	WithdrawHash []string `json:"l2ToL1WithdrawHash"`
+	ProveHash    []string `json:"l2ToL1ProveHash"`
+	FinalizeHash []string `json:"l2ToL1FinalizeHash"`
 }
 
-type WithdrawHashDatabase struct {
-	Database []WithdrawHashDatabaseItem `json:"database"`
+type WithdrawHashDatabaseItem struct {
+	UserAddr   string   `json:"userAddr"`
+	L1ToL2Hash []string `json:"l1ToL2Hash"`
+	L2ToL1Hash L2ToL1   `json:"l2ToL1Hash"`
 }
 
 var database map[string]WithdrawHashDatabaseItem
@@ -129,8 +132,12 @@ func main() {
 		// 设置cors中间件
 		r.Use(cors.New(config))
 
-		r.POST("/getUserTxHash", getUserTxHash)
-		r.POST("/writeTxHash", writeTxHash)
+		r.POST("/getL1ToL2Hash", getL1ToL2Hash)
+		r.POST("/getL2ToL1Hash", getL2ToL1Hash)
+		r.POST("/writeWithdrawHash", writeWithdrawHash)
+		r.POST("/writeProveHash", writeProveHash)
+		r.POST("/writeFinalizeHash", writeFinalizeHash)
+
 		r.POST("/getProveWithdrawalPara", getProveWithdrawalPara)
 		r.POST("/getFinalizePara", getFinalizePara)
 
@@ -344,13 +351,13 @@ func wrapSuccess(success string) string {
 	return string(ret)
 }
 
-func writeTxHash(c *gin.Context) {
+func writeFinalizeHash(c *gin.Context) {
 	pwd, _ := os.Getwd()
 	path := pwd + "/datadir/withrawHash.json"
 	fmt.Println("path:", path)
 	type Resp struct {
 		UserAddr     string `json:"userAddr"`
-		WithdrawHash string `json:"withdrawHash"`
+		WithdrawHash string `json:"txHash"`
 	}
 	var res = Resp{}
 	c.Header("Content-Type", "application/json")
@@ -362,7 +369,7 @@ func writeTxHash(c *gin.Context) {
 		return
 	}
 
-	tmp := database[res.UserAddr].WithdrawHash
+	tmp := database[res.UserAddr].L2ToL1Hash.FinalizeHash
 	for _, item := range tmp {
 		if item == res.WithdrawHash {
 			c.String(200, wrapError("already contain this withdraw hash"))
@@ -371,8 +378,13 @@ func writeTxHash(c *gin.Context) {
 	}
 	tmp = append(tmp, res.WithdrawHash)
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
-		UserAddr:     res.UserAddr,
-		WithdrawHash: tmp,
+		UserAddr:   res.UserAddr,
+		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
+		L2ToL1Hash: L2ToL1{
+			WithdrawHash: database[res.UserAddr].L2ToL1Hash.WithdrawHash,
+			ProveHash:    database[res.UserAddr].L2ToL1Hash.ProveHash,
+			FinalizeHash: tmp,
+		},
 	}
 	err = writeFile(path)
 	if err != nil {
@@ -383,7 +395,95 @@ func writeTxHash(c *gin.Context) {
 	return
 }
 
-func getUserTxHash(c *gin.Context) {
+func writeProveHash(c *gin.Context) {
+	pwd, _ := os.Getwd()
+	path := pwd + "/datadir/withrawHash.json"
+	fmt.Println("path:", path)
+	type Resp struct {
+		UserAddr     string `json:"userAddr"`
+		WithdrawHash string `json:"txHash"`
+	}
+	var res = Resp{}
+	c.Header("Content-Type", "application/json")
+
+	dataB, err := c.GetRawData()
+	err = json.Unmarshal(dataB, &res)
+	if err != nil {
+		c.String(200, wrapError("parse json fail. req:"+string(dataB)))
+		return
+	}
+
+	tmp := database[res.UserAddr].L2ToL1Hash.ProveHash
+	for _, item := range tmp {
+		if item == res.WithdrawHash {
+			c.String(200, wrapError("already contain this withdraw hash"))
+			return
+		}
+	}
+	tmp = append(tmp, res.WithdrawHash)
+	database[res.UserAddr] = WithdrawHashDatabaseItem{
+		UserAddr:   res.UserAddr,
+		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
+		L2ToL1Hash: L2ToL1{
+			WithdrawHash: database[res.UserAddr].L2ToL1Hash.WithdrawHash,
+			ProveHash:    tmp,
+			FinalizeHash: database[res.UserAddr].L2ToL1Hash.FinalizeHash,
+		},
+	}
+	err = writeFile(path)
+	if err != nil {
+		c.String(200, wrapError("write fail"))
+		return
+	}
+	c.String(200, wrapSuccess("success"))
+	return
+}
+
+func writeWithdrawHash(c *gin.Context) {
+	pwd, _ := os.Getwd()
+	path := pwd + "/datadir/withrawHash.json"
+	fmt.Println("path:", path)
+	type Resp struct {
+		UserAddr     string `json:"userAddr"`
+		WithdrawHash string `json:"txHash"`
+	}
+	var res = Resp{}
+	c.Header("Content-Type", "application/json")
+
+	dataB, err := c.GetRawData()
+	err = json.Unmarshal(dataB, &res)
+	if err != nil {
+		c.String(200, wrapError("parse json fail. req:"+string(dataB)))
+		return
+	}
+
+	tmp := database[res.UserAddr].L2ToL1Hash.WithdrawHash
+	for _, item := range tmp {
+		if item == res.WithdrawHash {
+			c.String(200, wrapError("already contain this withdraw hash"))
+			return
+		}
+	}
+	tmp = append(tmp, res.WithdrawHash)
+	database[res.UserAddr] = WithdrawHashDatabaseItem{
+		UserAddr:   res.UserAddr,
+		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
+		L2ToL1Hash: L2ToL1{
+			WithdrawHash: tmp,
+			ProveHash:    database[res.UserAddr].L2ToL1Hash.ProveHash,
+			FinalizeHash: database[res.UserAddr].L2ToL1Hash.FinalizeHash,
+		},
+	}
+	err = writeFile(path)
+	if err != nil {
+		c.String(200, wrapError("write fail"))
+		return
+	}
+	c.String(200, wrapSuccess("success"))
+	return
+}
+
+func getL1ToL2Hash(c *gin.Context) {
 	type Req struct {
 		UserAddr string
 	}
@@ -408,7 +508,41 @@ func getUserTxHash(c *gin.Context) {
 		c.String(200, wrapError("no withdraw hash"))
 		return
 	}
-	withdrashHashesBytes, err := json.Marshal(withdrashHashes)
+	withdrashHashesBytes, err := json.Marshal(withdrashHashes.L1ToL2Hash)
+	if err != nil {
+		c.String(200, wrapError("internal fail:"+err.Error()))
+		return
+	}
+	c.Data(200, "application/json", withdrashHashesBytes)
+	return
+}
+
+func getL2ToL1Hash(c *gin.Context) {
+	type Req struct {
+		UserAddr string
+	}
+	var req = Req{}
+	c.Header("Content-Type", "application/json")
+
+	dataA, err := c.GetRawData()
+	err = json.Unmarshal(dataA, &req)
+	if err != nil {
+		c.String(200, wrapError(`{"error":"parse json fail"}`))
+		return
+	}
+	dataB := req.UserAddr
+	var userAddr string
+	userAddr = dataB
+	if len(userAddr) != 42 {
+		c.String(200, wrapError("len(str) is must be 42"))
+		return
+	}
+	withdrashHashes, is := database[userAddr]
+	if !is {
+		c.String(200, wrapError("no withdraw hash"))
+		return
+	}
+	withdrashHashesBytes, err := json.Marshal(withdrashHashes.L2ToL1Hash)
 	if err != nil {
 		c.String(200, wrapError("internal fail:"+err.Error()))
 		return
