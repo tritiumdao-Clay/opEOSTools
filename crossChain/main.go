@@ -508,7 +508,11 @@ func getL1ToL2Hash(c *gin.Context) {
 		c.String(200, wrapError("no withdraw hash"))
 		return
 	}
-	withdrashHashesBytes, err := json.Marshal(withdrashHashes.L1ToL2Hash)
+	withdrashHashesBytes, err := json.Marshal(struct {
+		L1ToL2 []string `json:"l1ToL2Hash"`
+	}{
+		L1ToL2: withdrashHashes.L1ToL2Hash,
+	})
 	if err != nil {
 		c.String(200, wrapError("internal fail:"+err.Error()))
 		return
@@ -542,7 +546,11 @@ func getL2ToL1Hash(c *gin.Context) {
 		c.String(200, wrapError("no withdraw hash"))
 		return
 	}
-	withdrashHashesBytes, err := json.Marshal(withdrashHashes.L2ToL1Hash)
+	withdrashHashesBytes, err := json.Marshal(struct {
+		L2ToL1 L2ToL1 `json:"l2ToL1Hash"`
+	}{
+		L2ToL1: withdrashHashes.L2ToL1Hash,
+	})
 	if err != nil {
 		c.String(200, wrapError("internal fail:"+err.Error()))
 		return
