@@ -30,17 +30,20 @@ func tomHandler(w http.ResponseWriter, r *http.Request) {
 			var data = strings.NewReader(string(dataB))
 			req, err := http.NewRequest("POST", "https://api.testnet.evm.eosnetwork.com", data)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println("err:", err.Error())
+				return
 			}
 			req.Header.Set("Content-Type", "application/json")
 			resp, err := client.Do(req)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println("err:", err.Error())
+				return
 			}
 			defer resp.Body.Close()
 			bodyText, err := io.ReadAll(resp.Body)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println("err:", err.Error())
+				return
 			}
 			//bodyText = bodyText[:len(bodyText)-1]
 			w.Header().Set("Content-Type", "application/json")
@@ -58,10 +61,12 @@ func tomHandler(w http.ResponseWriter, r *http.Request) {
 			err = json.Unmarshal(bodyText, &jsonResult)
 			if err != nil {
 				fmt.Println("debug2", err.Error())
+				return
 			}
 			bod, err := json.Marshal(jsonResult)
 			if err != nil {
 				fmt.Println("debug3", err.Error())
+				return
 			}
 			fmt.Println("------2----")
 			fmt.Printf("%s", bod)
