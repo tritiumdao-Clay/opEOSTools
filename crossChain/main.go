@@ -29,10 +29,15 @@ type network struct {
 }
 
 var networks = map[string]network{
+	//"opeostest": {
+	//	l2RPC:         "https://testnet-rpc.opeos.io",
+	//	portalAddress: "0x83465894dDD2FCA3a9ffFF85a03DB9fB4EB85b11",
+	//	l2OOAddress:   "0x05a9FAe037A33DD02D50846423e60F5FBCCc3806",
+	//},
 	"opeostest": {
-		l2RPC:         "https://testnet-rpc.opeos.io",
-		portalAddress: "0x70d544de5f1c7C4a9f09a82a07eB8F360B040169",
-		l2OOAddress:   "0xB28aF3ac0c2847DE28345bb3b821dd8744f6fC6F",
+		l2RPC:         "http://13.228.210.115:8545",
+		portalAddress: "0x83465894dDD2FCA3a9ffFF85a03DB9fB4EB85b11",
+		l2OOAddress:   "0x05a9FAe037A33DD02D50846423e60F5FBCCc3806",
 	},
 	"opeos": {
 		l2RPC:         "",
@@ -101,6 +106,9 @@ func main() {
 	if rpcFlag == "" {
 		log.Fatalf("missing --rpc flag")
 	}
+	fmt.Println("debug0", startHTTP)
+	fmt.Println("debug1", privateKey)
+	fmt.Println("debug2", rpcFlag)
 
 	if startHTTP {
 		pwd, _ := os.Getwd()
@@ -150,6 +158,7 @@ func main() {
 
 		r.Run(":10003")
 	} else {
+		fmt.Println("debug4")
 		if withdrawalFlag == "" {
 			log.Fatalf("missing --withdrawal flag")
 		}

@@ -8,7 +8,7 @@ cast send --rpc-url $L2_RPC --legacy --cast-async --value 1 --private-key $DEPLO
 
 ```javascript
 // prove tx:
-go run main.go --rpc $L1_RPC --network opeostest --start-http false --private-key $KEY --withdrawal $TXHASH
+go run main.go --rpc=$L1_RPC --network=opeostest --start-http=false --private-key=$KEY --withdrawal=$TXHASH
 ```
 
 ```javascript
