@@ -144,7 +144,7 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 
 	fmt.Println("debug24")
 	type typesWithdrawalTransaction struct {
-		Nonce    *big.Int       `json:"nonce"`
+		Nonce    string         `json:"nonce"`
 		Sender   common.Address `json:"sender"`
 		Target   common.Address `json:"target"`
 		Value    *big.Int       `json:"value"`
@@ -169,7 +169,7 @@ func ProveWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Client
 		WithdrawalProof            []string                   `json:"withdrawalProof"`
 	}{
 		TypesWithdrawalTransaction: typesWithdrawalTransaction{
-			Nonce:    params.Nonce,
+			Nonce:    params.Nonce.String(),
 			Sender:   params.Sender,
 			Target:   params.Target,
 			Value:    params.Value,
@@ -255,16 +255,15 @@ func CompleteWithdrawal2(ctx context.Context, l1 *ethclient.Client, l2c *rpc.Cli
 	}
 
 	type typesWithdrawalTransaction struct {
-		Nonce    *big.Int       `json:"nonce"`
+		Nonce    string         `json:"nonce"`
 		Sender   common.Address `json:"sender"`
 		Target   common.Address `json:"target"`
 		Value    *big.Int       `json:"value"`
 		GasLimit *big.Int       `json:"gasLimit"`
 		Data     string         `json:"data"`
 	}
-
 	var res = typesWithdrawalTransaction{
-		Nonce:    params.Nonce,
+		Nonce:    params.Nonce.String(),
 		Sender:   params.Sender,
 		Target:   params.Target,
 		Value:    params.Value,
