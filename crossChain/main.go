@@ -59,9 +59,9 @@ type Hash struct {
 }
 
 type L2ToL1 struct {
-	WithdrawHash Hash `json:"l2ToL1WithdrawHash"`
-	ProveHash    Hash `json:"l2ToL1ProveHash"`
-	FinalizeHash Hash `json:"l2ToL1FinalizeHash"`
+	WithdrawHash Hash   `json:"l2ToL1WithdrawHash"`
+	ProveHash    string `json:"l2ToL1ProveHash"`
+	FinalizeHash string `json:"l2ToL1FinalizeHash"`
 }
 
 type WithdrawHashDatabaseItem struct {
@@ -390,20 +390,21 @@ func writeFinalizeHash(c *gin.Context) {
 	var index = NEGATIVE_ONE
 	tmp := database[res.UserAddr].L2ToL1Hash
 	for i, item := range tmp {
-		if item.FinalizeHash == res.WithdrawHash || item.FinalizeHash.TxHash == res.WithdrawHash.TxHash {
-			c.String(200, wrapError("already contain this withdraw hash"))
+		if !(item.WithdrawHash.TxHash == res.Hash) {
+			continue
+		}
+		if item.FinalizeHash != "" || item.FinalizeHash == res.WithdrawHash.TxHash {
+			c.String(200, wrapError("already contain this prove hash:"+item.ProveHash))
 			return
 		}
-		if item.WithdrawHash.TxHash == res.Hash {
-			index = i
-			break
-		}
+		index = i
+		break
 	}
 	if NEGATIVE_ONE == index {
 		c.String(200, wrapError("this withdraw hash isn't exist"))
 		return
 	}
-	tmp[index].FinalizeHash = res.WithdrawHash
+	tmp[index].FinalizeHash = res.WithdrawHash.TxHash
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
 		UserAddr:   res.UserAddr,
 		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
@@ -442,20 +443,21 @@ func writeProveHash(c *gin.Context) {
 	const NEGATIVE_ONE = -1
 	var index = NEGATIVE_ONE
 	for i, item := range tmp {
-		if item.ProveHash == res.WithdrawHash || item.ProveHash.TxHash == res.WithdrawHash.TxHash {
-			c.String(200, wrapError("already contain this withdraw hash"))
+		if !(item.WithdrawHash.TxHash == res.Hash) {
+			continue
+		}
+		if item.ProveHash != "" || item.ProveHash == res.WithdrawHash.TxHash {
+			c.String(200, wrapError("already contain this prove hash:"+item.ProveHash))
 			return
 		}
-		if item.WithdrawHash.TxHash == res.Hash {
-			index = i
-			break
-		}
+		index = i
+		break
 	}
 	if NEGATIVE_ONE == index {
 		c.String(200, wrapError("this withdraw hash isn't exist"))
 		return
 	}
-	tmp[index].ProveHash = res.WithdrawHash
+	tmp[index].ProveHash = res.WithdrawHash.TxHash
 	database[res.UserAddr] = WithdrawHashDatabaseItem{
 		UserAddr:   res.UserAddr,
 		L1ToL2Hash: database[res.UserAddr].L1ToL2Hash,
