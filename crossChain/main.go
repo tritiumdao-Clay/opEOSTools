@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/autotls"
 	"log"
 	"math/big"
 	"os"
@@ -156,7 +157,8 @@ func main() {
 		r.POST("/getProveWithdrawalPara", getProveWithdrawalPara)
 		r.POST("/getFinalizePara", getFinalizePara)
 
-		r.Run(":10003")
+		autotls.Run(r, ":10003")
+		//r.Run(":10003")
 	} else {
 		fmt.Println("debug4")
 		if withdrawalFlag == "" {
