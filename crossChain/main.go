@@ -156,8 +156,8 @@ func main() {
 		r.POST("/getProveWithdrawalPara", getProveWithdrawalPara)
 		r.POST("/getFinalizePara", getFinalizePara)
 
-		r.RunTLS(":10003", "server.crt", "server.key")
-		//r.Run(":10003")
+		//r.RunTLS(":10003", "server.crt", "server.key")
+		r.Run(":10003")
 	} else {
 		fmt.Println("debug4")
 		if withdrawalFlag == "" {
