@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/autotls"
 	"log"
 	"math/big"
 	"os"
@@ -157,7 +156,7 @@ func main() {
 		r.POST("/getProveWithdrawalPara", getProveWithdrawalPara)
 		r.POST("/getFinalizePara", getFinalizePara)
 
-		autotls.Run(r, "13.228.210.115:10003")
+		r.RunTLS(":10003", "server.crt", "server.key")
 		//r.Run(":10003")
 	} else {
 		fmt.Println("debug4")
